@@ -1,0 +1,51 @@
+*, *::after, *::before{
+    box-sizing: border-box;
+}
+
+body{
+    margin:0
+}
+
+.battlespace {
+    display: flex;
+    justify-content: space-around;
+}
+
+.playerspace {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.playerspace>h1{
+    margin: 1vw;
+}
+
+.playerhp {
+    margin: 1vw;
+}
+
+.playernamehp {
+    display: flex;
+    align-items: center;
+}
+
+.playeroptions{
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+}
+
+.monsterspace {
+    display: inline-flex;
+    justify-content: flex-start;
+}
+
+.monsterspace>h1{
+    margin: 1vw;
+}
+
+.monsterhp {
+    margin: 1vw;
+}
