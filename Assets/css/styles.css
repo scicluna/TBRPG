@@ -39,7 +39,9 @@ body{
 
 .monsterspace {
     display: inline-flex;
-    justify-content: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .monsterspace>h1{
@@ -48,4 +50,15 @@ body{
 
 .monsterhp {
     margin: 1vw;
+}
+
+.monsternamehp {
+    display: flex;
+    align-items: center;
+}
+
+.monsteroptions{
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
 }

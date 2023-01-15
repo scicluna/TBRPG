@@ -1,7 +1,7 @@
 export class Player {
 
-    constructor(element, hp, attacks){
-        this.element = element
+    constructor(name, hp, attacks){
+        this.name = name
         this.hp = hp
         this.attacks = attacks
     }
