@@ -4,14 +4,19 @@ export class Player {
         this.name = name
         this.hp = hp
         this.attacks = attacks
+        this.reset()
     }
 
     reset(){
-        this.hp = hp
+        this.items = ["potion"]
     }
 
     attacks(){
         return this.attacks
+    }
+
+    items(){
+        return this.items
     }
 
 }
