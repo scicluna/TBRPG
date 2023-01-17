@@ -33,5 +33,8 @@ export function hpResets(){
 const slime = new Monster("Slime", 10, ["slam"], ["potion"])
 const slime1 = new Monster("Slime", 10, ["slam"], ["potion"])
 const bear = new Monster("Bear", 15, ["bite", "claw"], [])
+const bear1 = new Monster("Bear", 15, ["bite", "claw"], [])
+const tiger = new Monster("Tiger", 15, ["claw"], [])
+const tiger1 = new Monster("Tiger", 15, ["claw"], [])
 
-export const monsters = [[slime, slime1],[slime, bear], [slime, slime1, bear], [bear]]
+export const monsters = [[slime, slime1],[slime, bear], [slime, slime1, bear], [bear, bear1, tiger, tiger1]]

@@ -11,10 +11,12 @@ const monsterHP = document.querySelectorAll("#monsterhp")
 const monsterName = document.querySelectorAll("#monstername")
 const monsterOptions = document.querySelectorAll("#monsteroptions")
 const playerItems = document.getElementById("playeritems")
+const background = document.querySelector("body")
 
 //creating a new "player"
 export let player = new Player("Player", 10, ["sword", "cleave"])
 
+export let nN = 0 // node number
 export let cE = 0 //creature encounter
 let mC = 0 //monster count
 
@@ -24,8 +26,9 @@ function init(){
         console.log("out of enemies")
         return
     } 
+    backgroundChange()
     hpResets()
-    pickMonster(cE)
+    pickMonster()
     cleanAttacks()
     displayAttacks(player)
     displayItems(player)
@@ -110,6 +113,7 @@ function hpUpdate(){
             } else if (monsterName[i].classList.contains("dead") && i === monsters[cE].length-1){
                 console.log("You killed the monsters!")
                 //just move to the next set of monsters -- later on this may not be the case, or it may transition somewhere
+                //like, we can do "scene transitions" here instead of just picking up loot and moving to the next fight
                 lootDrop()
                 cE++ 
                 init() 
@@ -128,7 +132,7 @@ function hpUpdate(){
 }
 
 //selects which mosnters should show up on the screen
-function pickMonster(cE){
+function pickMonster(){
 
     monsterName.forEach(monster=>{monster.innerHTML=""})
     monsterHP.forEach(monster=>{monster.innerHTML=""})
@@ -203,12 +207,22 @@ function useitem(e){
     displayItems(player)
 }
 
+//handles looting the monsters after killing them
 function lootDrop(){
     monsters[cE].forEach(monster=>{
-        player.items = [...player.items, ...monster.drop()]
+        player.items = [...player.items, ...monster.drop()] //use spreaders to set the array to its new value
     })
 }
 
+function backgroundChange(){
+    const forest = 'url(./Assets/css/backgrounds/forest.jpg)'
+    const plains = 'url(./Assets/css/backgrounds/plains.jpg)'
+    const coast = 'url(./Assets/css/backgrounds/coast.jpg)'
+    const cliffs = 'url(./Assets/css/backgrounds/cliffs.jpg)'
+    const backgrounds = [forest,plains,coast,cliffs] //backgrounds in some kind of order tied to either nN or cE
+
+    background.style.backgroundImage=backgrounds[cE] //probably want to link this to nN at some point, once i figure out how to mix combat with non-combat.
+}
 
 //TODO
 //More Attacks
