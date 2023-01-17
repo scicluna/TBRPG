@@ -92,31 +92,49 @@ function attack(e){
 //still need to add a check for player game overs
 function hpUpdate(){
     
+    let deathFlag = false
+    let deathCount = 0
+    //mark monsters as dead and remove target from them
     for (let i=0; i<monsters[cE].length; i++){
-        monsterHP[i].innerText = monsters[cE][i].hp
-        if(monsters[cE][i].hp < 1) {
+        if(!monsterName[i].classList.contains("dead")){
+            monsterHP[i].innerText = monsters[cE][i].hp
+        }
+
+        if(monsters[cE][i].hp < 1 && !monsterName[i].classList.contains("dead")) {
             monsterHP[i].innerText = "Dead"
             monsterName[i].classList.remove("target")
             monsterName[i].removeEventListener("click", target)
             monsterName[i].classList.add("dead")
-            if (monsters[cE][i+1] !== undefined && monsters[cE][i+1].hp > 0){
-                monsterName[i+1].classList.add("target")
-            } else if (monsters[cE][i-1] !== undefined && monsters[cE][i-1].hp > 0){
-                monsterName[i-1].classList.add("target")
-            } else if (monsterName[i].classList.contains("dead") && i === monsters[cE].length-1){
-                console.log("You killed the monsters!")
-                //just move to the next set of monsters -- later on this may not be the case, or it may transition somewhere
-                //like, we can do "scene transitions" here instead of just picking up loot and moving to the next fight
-                lootDrop()
-                nextScene()
-            }
-
+            deathFlag = true
         }
+    }
+
+    //find a new target
+    for (let i=0; i<monsters[cE].length; i++){
+        if (deathFlag === true && !monsterName[i].classList.contains("dead")){
+            monsterName[i].classList.add("target")
+            deathFlag = false
+            i += Infinity
+        }
+    }
+
+    //counting the dead
+    for (let i=0; i<monsters[cE].length; i++){
+        if (monsterName[i].classList.contains("dead")){
+            deathCount++
+        }
+    }
+
+    //if everything is dead, move on
+    if(deathCount === monsters[cE].length){
+        console.log("You killed the monsters!")
+        lootDrop()
+        nextScene()
     }
 
     playerHP.innerText = player.hp
 
-    //put end screen here
+    //put game-over screen here
     if(player.hp < 1){
         console.log("You died!")
     } 
@@ -211,16 +229,6 @@ function backgroundChange(){
     background.style.backgroundImage = map[nN].background //probably want to link this to nN at some point, once i figure out how to mix combat with non-combat.
 }
 
-//TODO
-//Random AI reactions
-//Timeouts between turns
-//Some kind of animation for attacks (like scrolling combat text, or something)
-
-//Non-combat nodes
-//More interesting items
-//Magic+Mp
-
-
 function battleStart(){
     if(monsters[cE] === undefined){
         console.log("out of enemies")
@@ -244,7 +252,17 @@ function findDestination(){
     nN = map[nN].destination
     cE = map[nN].encounter
     if(map[nN].battle){
-    window.alert("ready for the next battle?")
+    window.alert("ready for the next battle?") //Placeholder for some kind of screentext function w/ a button
     battleStart()
     }
 }
+
+//TODO
+//Random AI reactions
+//Timeouts between turns
+//Some kind of animation for attacks (like scrolling combat text, or something)
+
+//Non-combat nodes
+//More interesting items
+//Magic+Mp
+
