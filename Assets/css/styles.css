@@ -76,3 +76,7 @@ body{
 .target{
     color:red
 }
+
+.hide{
+    display:none
+}

@@ -13,6 +13,10 @@ const monsterName = document.querySelectorAll("#monstername")
 const monsterOptions = document.querySelectorAll("#monsteroptions")
 const playerItems = document.getElementById("playeritems")
 const background = document.querySelector("body")
+const battleSpace = document.querySelector(".battlespace")
+const peaceSpace = document.querySelector(".peacespace")
+const peaceText = document.querySelector(".text")
+const peaceOptions = document.querySelector(".peaceoptions")
 
 //creating a new "player"
 export let player = new Player("Player", 10, ["sword", "cleave"])
@@ -20,6 +24,9 @@ export let player = new Player("Player", 10, ["sword", "cleave"])
 export let nN = 0 // node number
 export let cE = 0 //creature encounter
 let mC = 0 //monster count
+
+let activeBattle = true
+let monstersAlive = true
 
 //running the game
 function init(){
@@ -38,7 +45,6 @@ function nextScene(){
 function displayAttacks(character){
     let char = character.name.toLowerCase()
     let attacks = character.attacks
-
     //loop for monsters
     if (char !== "player"){
             for (let j=0; j<attacks.length; j++){
@@ -49,9 +55,7 @@ function displayAttacks(character){
                 btn.addEventListener("click", attack)
                 monsterOptions[mC].appendChild(btn) //mC is kind of like i, but i wanted to use a forEach loop instead for fun
             }
-        
     }
-        
     //loop for player
     if (char === "player"){
         for (let j=0; j<attacks.length; j++){
@@ -61,8 +65,8 @@ function displayAttacks(character){
             btn.classList.add(`${char}Attack`)
             btn.addEventListener("click", attack)
             playerOptions.appendChild(btn)
+        }
     }
-}
 }
 
 //finds the target and executes the damage value ala the attackLibrary
@@ -73,11 +77,9 @@ function attack(e){
 
     if (attacker === "player"){
         for (let i=0; i<monsters[cE].length; i++){
-
             if (monsterName[i].classList.contains("target")){
                 target = monsters[cE][i]
             }
-
         }
     } else target = player
 
@@ -85,21 +87,60 @@ function attack(e){
     attackLibrary[attackName](target)
     hpUpdate()
 
+    if(monstersAlive){
+    aiRetaliation()
+    }
+
+    if(!monstersAlive){
+        let victory = setInterval(()=>{
+            lootDrop()
+            nextScene()
+            clearInterval(victory)
+        },500)
+    }
+}
+
+//handles the ai turns -- make a weighted average formula to determine a weight on each attack
+function aiRetaliation(){
+    let target = player
+    let attackOptions = []
+
+    if(monsters[cE] === undefined){
+        return
+    }
+
+    monsters[cE].forEach(monster=>{
+        if (monster.hp > 0){
+        attackOptions.push(monster.attacks)
+        }
+    })
+
+    if(attackOptions[0] === undefined){
+        return
+    }
+
+    attackOptions.forEach(options=>{
+        let randomIndex = Math.floor(Math.random()*(options.length))
+        let attackName = options[randomIndex].toLowerCase()
+        attackLibrary[attackName](target)
+    })
+    hpUpdate()
 }
 
 //handles life and death for each character on the screen
 //handles moving targets against the monsters in the case that the current target dies
 //still need to add a check for player game overs
 function hpUpdate(){
-    
+    monstersAlive = true
     let deathFlag = false
     let deathCount = 0
-    //mark monsters as dead and remove target from them
+
+    //if the monster isn't dead... display its HP
     for (let i=0; i<monsters[cE].length; i++){
         if(!monsterName[i].classList.contains("dead")){
             monsterHP[i].innerText = monsters[cE][i].hp
         }
-
+        //mark monsters as dead and remove target from them
         if(monsters[cE][i].hp < 1 && !monsterName[i].classList.contains("dead")) {
             monsterHP[i].innerText = "Dead"
             monsterName[i].classList.remove("target")
@@ -108,7 +149,6 @@ function hpUpdate(){
             deathFlag = true
         }
     }
-
     //find a new target
     for (let i=0; i<monsters[cE].length; i++){
         if (deathFlag === true && !monsterName[i].classList.contains("dead")){
@@ -117,19 +157,16 @@ function hpUpdate(){
             i += Infinity
         }
     }
-
     //counting the dead
     for (let i=0; i<monsters[cE].length; i++){
         if (monsterName[i].classList.contains("dead")){
             deathCount++
         }
     }
-
     //if everything is dead, move on
     if(deathCount === monsters[cE].length){
         console.log("You killed the monsters!")
-        lootDrop()
-        nextScene()
+        monstersAlive=false
     }
 
     playerHP.innerText = player.hp
@@ -143,7 +180,6 @@ function hpUpdate(){
 
 //selects which mosnters should show up on the screen
 function pickMonster(){
-
     monsterName.forEach(monster=>{monster.innerHTML=""})
     monsterHP.forEach(monster=>{monster.innerHTML=""})
     if(monsters[cE] !== undefined){
@@ -226,10 +262,12 @@ function lootDrop(){
 
 //handles changing the background image
 function backgroundChange(){
-    background.style.backgroundImage = map[nN].background //probably want to link this to nN at some point, once i figure out how to mix combat with non-combat.
+    background.style.backgroundImage = map[nN].background
 }
 
+//initiates a battle sequence
 function battleStart(){
+    battleSwitch()
     if(monsters[cE] === undefined){
         console.log("out of enemies")
         return
@@ -247,15 +285,70 @@ function battleStart(){
     initMonsters()
 }
 
+//initiates a roleplaying sequence
+function roleplayStart(){
+    battleSwitch()
+    peaceUpdate()
+}
+
 //adjusts our nN and cE to reflect the next destination
 function findDestination(){
     nN = map[nN].destination
-    cE = map[nN].encounter
+    cE = map[nN].encounter || null
     if(map[nN].battle){
-    window.alert("ready for the next battle?") //Placeholder for some kind of screentext function w/ a button
-    battleStart()
+        window.alert("ready for the next battle?") //Placeholder for some kind of screentext function w/ a button
+        activeBattle = true
+        battleStart()
+    }
+    if(!map[nN].battle){
+        window.alert("peaceful encounter")
+        activeBattle = false
+        roleplayStart()
     }
 }
+
+//handles scene changes between battle and peace
+function battleSwitch(){
+    if(!activeBattle){
+        battleSpace.classList.add("hide")
+        peaceSpace.classList.remove("hide")
+    }
+    if(activeBattle){
+        battleSpace.classList.remove("hide")
+        peaceSpace.classList.add("hide")
+    }
+}
+
+//updates the text for the peacetime scenes
+function peaceUpdate(){
+    peaceText.innerText = map[nN].txt
+
+    map[nN].options.forEach(option=>{
+        let btn = document.createElement("button")
+        btn.innerText = option.txt
+        btn.classList.add("options")
+        btn.addEventListener("click", playerChoice)
+        peaceOptions.appendChild(btn)
+    })
+}
+
+//handles the choice selection in peacetime
+function playerChoice(e){
+    let selectedOption = e.target
+    const options = document.querySelectorAll(".options")
+    let optionIndex;
+
+    for (let i=0; i<options.length; i++){
+        if(options[i] === selectedOption){
+            optionIndex = i
+        }
+    }
+
+    map[nN].options[optionIndex].event()
+    
+    nextScene()
+}
+
 
 //TODO
 //Random AI reactions

@@ -10,13 +10,13 @@ export const attackLibrary =
         target.hp -= 1
     },
     bite: (target)=>{
-        target.hp -= 4
-    },
-    slam: (target)=>{
         target.hp -= 3
     },
+    slam: (target)=>{
+        target.hp -= 2
+    },
     claw: (target)=>{
-        target.hp -= 5
+        target.hp -= 2
     },
     cleave: ()=>{
         monsters[cE].forEach(monster=>{
