@@ -1,7 +1,13 @@
-import { player } from "./script.js"
+import { monsters } from "./monster.js"
+import { player, cE } from "./script.js"
 
 export const itemLibrary = {
     potion: ()=>{
-        return player.hp += 5
+        player.hp += 5
+    },
+    bomb: ()=>{
+        monsters[cE].forEach(monster=>{
+            monster.hp -= 5
+        })
     }
 }

@@ -8,7 +8,7 @@ export class Player {
     }
 
     reset(){
-        this.items = ["potion"]
+        this.items = ["potion", "bomb"]
     }
 
     attacks(){

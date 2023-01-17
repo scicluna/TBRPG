@@ -1,10 +1,11 @@
 export class Monster {
 
-    constructor(name, hp, attacks){
+    constructor(name, hp, attacks, loot){
         this.originalhp = hp
         this.name = name
         this.hp = hp
         this.attacks = attacks
+        this.loot = loot
         this.reset()
     }
 
@@ -16,6 +17,10 @@ export class Monster {
         return this.attacks
     }
 
+    drop(){
+        return this.loot
+    }
+
 }
 
 export function hpResets(){
@@ -25,8 +30,8 @@ export function hpResets(){
 }
 
 //is there really no better way to do this? Every slime in my entire game needs to be cloned once for each on screen?
-const slime = new Monster("Slime", 10, ["slam"])
-const slime1 = Object.create(slime)
-const bear = new Monster("Bear", 15, ["bite", "claw"])
+const slime = new Monster("Slime", 10, ["slam"], ["potion"])
+const slime1 = new Monster("Slime", 10, ["slam"], ["potion"])
+const bear = new Monster("Bear", 15, ["bite", "claw"], [])
 
-export const monsters = [[slime, slime1],[slime, bear], [slime, slime1]]
+export const monsters = [[slime, slime1],[slime, bear], [slime, slime1, bear], [bear]]

@@ -12,20 +12,24 @@ const monsterName = document.querySelectorAll("#monstername")
 const monsterOptions = document.querySelectorAll("#monsteroptions")
 const playerItems = document.getElementById("playeritems")
 
+//creating a new "player"
+export let player = new Player("Player", 10, ["sword", "cleave"])
 
-export let player = new Player("Player", 10, ["sword", "kick"])
-
-let cE = 0 //creature encounter
+export let cE = 0 //creature encounter
 let mC = 0 //monster count
 
+//running the game
 function init(){
+    if(monsters[cE] === undefined){
+        console.log("out of enemies")
+        return
+    } 
     hpResets()
     pickMonster(cE)
     cleanAttacks()
     displayAttacks(player)
     displayItems(player)
     mC = 0
-    if(!monsters[cE]){console.log("out of enemies")}
     monsters[cE].forEach(monster=>{
         displayAttacks(monster)
         mC++
@@ -34,23 +38,25 @@ function init(){
 }
 init()
 
+//displaying attack options for all of the characters on the screen
 function displayAttacks(character){
     let char = character.name.toLowerCase()
     let attacks = character.attacks
 
+    //loop for monsters
     if (char !== "player"){
-
             for (let j=0; j<attacks.length; j++){
                 let btn = document.createElement("button")
                 let btnContent = attacks[j]
                 btn.innerText = btnContent 
                 btn.classList.add(`${char}Attack`)
                 btn.addEventListener("click", attack)
-                monsterOptions[mC].appendChild(btn)
+                monsterOptions[mC].appendChild(btn) //mC is kind of like i, but i wanted to use a forEach loop instead for fun
             }
         
     }
         
+    //loop for player
     if (char === "player"){
         for (let j=0; j<attacks.length; j++){
             let btn = document.createElement("button")
@@ -63,12 +69,12 @@ function displayAttacks(character){
 }
 }
 
+//finds the target and executes the damage value ala the attackLibrary
 function attack(e){
     let attacker = e.target.classList.value.split("A").splice(0,1).join()
     let attackName = e.target.innerText.toLowerCase()
     let target;
 
-    //determining the target will be more tricky when i introduce multiple enemies
     if (attacker === "player"){
         for (let i=0; i<monsters[cE].length; i++){
 
@@ -79,27 +85,34 @@ function attack(e){
         }
     } else target = player
 
-    target.hp -= attackLibrary[attackName]
-    hpUpdate(target)
+    //updates the values to reflect the attack
+    attackLibrary[attackName](target)
+    hpUpdate()
 
 }
 
+//handles life and death for each character on the screen
+//handles moving targets against the monsters in the case that the current target dies
+//still need to add a check for player game overs
 function hpUpdate(){
     
-    for (let i=0; i<monsterHP.length; i++){
+    for (let i=0; i<monsters[cE].length; i++){
         monsterHP[i].innerText = monsters[cE][i].hp
         if(monsters[cE][i].hp < 1) {
             monsterHP[i].innerText = "Dead"
             monsterName[i].classList.remove("target")
+            monsterName[i].removeEventListener("click", target)
             monsterName[i].classList.add("dead")
             if (monsters[cE][i+1] !== undefined && monsters[cE][i+1].hp > 0){
                 monsterName[i+1].classList.add("target")
             } else if (monsters[cE][i-1] !== undefined && monsters[cE][i-1].hp > 0){
                 monsterName[i-1].classList.add("target")
-            } else if (monsterName[i].classList.contains("dead")){
+            } else if (monsterName[i].classList.contains("dead") && i === monsters[cE].length-1){
                 console.log("You killed the monsters!")
-                cE++
-                init()
+                //just move to the next set of monsters -- later on this may not be the case, or it may transition somewhere
+                lootDrop()
+                cE++ 
+                init() 
             }
 
         }
@@ -107,18 +120,18 @@ function hpUpdate(){
 
     playerHP.innerText = player.hp
 
+    //put end screen here
     if(player.hp < 1){
         console.log("You died!")
     } 
 
-    if(monsters[cE].hp <1){
-        console.log("You killed the monster!")
-        cE++
-        init()
-    }
 }
 
+//selects which mosnters should show up on the screen
 function pickMonster(cE){
+
+    monsterName.forEach(monster=>{monster.innerHTML=""})
+    monsterHP.forEach(monster=>{monster.innerHTML=""})
     if(monsters[cE] !== undefined){
         for (let i=0; i<monsters[cE].length; i++){
             monsterName[i].innerText = monsters[cE][i].name
@@ -127,14 +140,18 @@ function pickMonster(cE){
 }
 }
 
+//initializes the targetting system
 function initMonsters(){
     monsterName.forEach(monster=>{
         monster.addEventListener("click", target)
+        monster.classList.remove("dead")
     })
     monsterName[0].classList.add("target")
     monsterName[1].classList.remove("target")
+
 }
 
+//handles the targetting system
 function target(e){
     let selectedTarget = e.target
     monsterName.forEach(name=>{
@@ -143,13 +160,14 @@ function target(e){
     selectedTarget.classList.add("target")
 }
 
+//cleans out monster and player attacks inbetween rounds
 function cleanAttacks(){
         playerOptions.innerHTML = ""
         monsterOptions.forEach(option=>{option.innerHTML = ""})
 }
 
+//shows players inventory and adds event listeners to their buttons
 function displayItems(player){
-
 playerItems.innerHTML = ""
     player.items.forEach(item=>{
         let btn = document.createElement("button")
@@ -159,20 +177,46 @@ playerItems.innerHTML = ""
         btn.addEventListener("click", useitem)
         playerItems.appendChild(btn)
     })
-
 }
 
+//allows me to consume items and run a function depending on what the item was
 function useitem(e){
-    let item = e.target.innerText
-    itemLibrary[item]()
     console.log(player)
+    
+    let selectedItem = e.target  
+    const items = document.querySelectorAll(".item")
+    let itemIndex;
 
-    for (let i=0; i<player.items.length; i++){
-        if(player.items[i] == item){
-            player.items.splice(i,1)
+    for (let i=0; i<items.length; i++){
+        if(items[i] === selectedItem){
+            itemIndex = i
         }
     }
 
+    let item = e.target.innerText
+    itemLibrary[item]() //executes code from our itemLibrary object
+
+    player.items.splice(itemIndex, 1)
+
+    //updates our DOMs
     hpUpdate(player)
     displayItems(player)
 }
+
+function lootDrop(){
+    monsters[cE].forEach(monster=>{
+        player.items = [...player.items, ...monster.drop()]
+    })
+}
+
+
+//TODO
+//More Attacks
+//AOE Attacks
+
+//More interesting items
+//Magic+Mp
+
+//Random AI reactions
+//Timeouts between turns
+

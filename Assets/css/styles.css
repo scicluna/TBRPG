@@ -14,8 +14,9 @@ body{
 .playerspace {
     display: inline-flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    height: 20vh;
 }
 
 .playerspace>h1{
@@ -37,11 +38,18 @@ body{
     justify-content: left;
 }
 
+.playeritems{
+   display: flex;
+   flex-direction: column;
+   margin-top: 1vh; 
+}
+
 .monsterspace{
     display: inline-flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    height: 20vh;
 }
 
 .monsterspace>h1{
