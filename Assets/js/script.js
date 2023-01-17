@@ -2,6 +2,7 @@ import { Player } from "./player.js"
 import { monsters, hpResets } from "./monster.js"
 import { attackLibrary } from "./attacks.js"
 import { itemLibrary } from "./items.js"
+import { map } from "./map.js"
 
 //DOMS
 const playerName = document.getElementById("playername")
@@ -22,24 +23,16 @@ let mC = 0 //monster count
 
 //running the game
 function init(){
-    if(monsters[cE] === undefined){
-        console.log("out of enemies")
-        return
-    } 
+    //tutorial insert here w/ starting battle
     backgroundChange()
-    hpResets()
-    pickMonster()
-    cleanAttacks()
-    displayAttacks(player)
-    displayItems(player)
-    mC = 0
-    monsters[cE].forEach(monster=>{
-        displayAttacks(monster)
-        mC++
-    })
-    initMonsters()
+    battleStart()
 }
 init()
+
+function nextScene(){
+    findDestination()
+    backgroundChange()
+}
 
 //displaying attack options for all of the characters on the screen
 function displayAttacks(character){
@@ -115,8 +108,7 @@ function hpUpdate(){
                 //just move to the next set of monsters -- later on this may not be the case, or it may transition somewhere
                 //like, we can do "scene transitions" here instead of just picking up loot and moving to the next fight
                 lootDrop()
-                cE++ 
-                init() 
+                nextScene()
             }
 
         }
@@ -214,23 +206,45 @@ function lootDrop(){
     })
 }
 
+//handles changing the background image
 function backgroundChange(){
-    const forest = 'url(./Assets/css/backgrounds/forest.jpg)'
-    const plains = 'url(./Assets/css/backgrounds/plains.jpg)'
-    const coast = 'url(./Assets/css/backgrounds/coast.jpg)'
-    const cliffs = 'url(./Assets/css/backgrounds/cliffs.jpg)'
-    const backgrounds = [forest,plains,coast,cliffs] //backgrounds in some kind of order tied to either nN or cE
-
-    background.style.backgroundImage=backgrounds[cE] //probably want to link this to nN at some point, once i figure out how to mix combat with non-combat.
+    background.style.backgroundImage = map[nN].background //probably want to link this to nN at some point, once i figure out how to mix combat with non-combat.
 }
 
 //TODO
-//More Attacks
-//AOE Attacks
+//Random AI reactions
+//Timeouts between turns
+//Some kind of animation for attacks (like scrolling combat text, or something)
 
+//Non-combat nodes
 //More interesting items
 //Magic+Mp
 
-//Random AI reactions
-//Timeouts between turns
 
+function battleStart(){
+    if(monsters[cE] === undefined){
+        console.log("out of enemies")
+        return
+    } 
+    hpResets()
+    pickMonster()
+    cleanAttacks()
+    displayAttacks(player)
+    displayItems(player)
+    mC = 0
+    monsters[cE].forEach(monster=>{
+        displayAttacks(monster)
+        mC++
+    })
+    initMonsters()
+}
+
+//adjusts our nN and cE to reflect the next destination
+function findDestination(){
+    nN = map[nN].destination
+    cE = map[nN].encounter
+    if(map[nN].battle){
+    window.alert("ready for the next battle?")
+    battleStart()
+    }
+}

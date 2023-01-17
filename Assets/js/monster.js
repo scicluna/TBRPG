@@ -1,4 +1,4 @@
-export class Monster {
+class Monster {
 
     constructor(name, hp, attacks, loot){
         this.originalhp = hp
@@ -37,4 +37,9 @@ const bear1 = new Monster("Bear", 15, ["bite", "claw"], [])
 const tiger = new Monster("Tiger", 15, ["claw"], [])
 const tiger1 = new Monster("Tiger", 15, ["claw"], [])
 
-export const monsters = [[slime, slime1],[slime, bear], [slime, slime1, bear], [bear, bear1, tiger, tiger1]]
+export const monsters = [
+    [slime, slime1],
+    [slime, bear], 
+    [slime, slime1, bear], 
+    [bear, bear1, tiger, tiger1]
+]
