@@ -1,26 +1,36 @@
 import { monsters } from "./monster.js"
-import { player, cE } from "./script.js"
+import { player, cE, attackAnimation } from "./script.js"
 
 export const attackLibrary = 
 {
     sword: (target)=>{
-        target.hp -= 5
+        let damage = 5
+        target.hp -= damage
+        attackAnimation(target, damage)
     },
     kick: (target)=>{
         target.hp -= 1
     },
     bite: (target)=>{
-        target.hp -= 3
+        let damage = 3
+        target.hp -= damage
+        attackAnimation(target, damage)
     },
     slam: (target)=>{
-        target.hp -= 2
+        let damage = 2
+        target.hp -= damage
+        attackAnimation(target, damage)
     },
     claw: (target)=>{
-        target.hp -= 2
+        let damage = 2
+        target.hp -= damage
+        attackAnimation(target, damage)
     },
     cleave: ()=>{
         monsters[cE].forEach(monster=>{
-            monster.hp -= 3
+            let damage = 2
+            monster.hp -= damage
+            attackAnimation(monster, damage)
         })
     }
 }

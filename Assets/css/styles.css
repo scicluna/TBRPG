@@ -19,9 +19,15 @@ body{
     justify-content: flex-start;
     align-items: center;
     height: 20vh;
+    position:relative;
+    
 }
 
 .playerspace>h1{
+    margin: 1vw;
+}
+
+.playername{
     margin: 1vw;
 }
 
@@ -32,12 +38,22 @@ body{
 .playernamehp {
     display: flex;
     align-items: center;
+    height:30%;
+    margin: 1vh;
+    font-size: 2em;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
 }
+
 
 .playeroptions{
     display: flex;
     flex-direction: column;
     justify-content: left;
+}
+
+.playeroptions>button{
+    width:5vw;
 }
 
 .playeritems{
@@ -46,12 +62,18 @@ body{
    margin-top: 1vh; 
 }
 
+.playeritems>button{
+    width:5vw;
+}
+
 .monsterspace{
     display: inline-flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     height: 20vh;
+    position:relative;
+    width:15vw;
 }
 
 .monsterspace>h1{
@@ -65,6 +87,11 @@ body{
 .monsternamehp {
     display: flex;
     align-items: center;
+    height:30%;
+    margin: 1vh;
+    font-size: 2em;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
 }
 
 .monsteroptions{
@@ -73,10 +100,34 @@ body{
     justify-content: left;
 }
 
+.monsteroptions>button{
+    width:5vw;
+}
+
 .target{
     color:red
 }
 
 .hide{
     display:none
+}
+
+.floatingdamage{
+    position: absolute;
+    top: 30px;
+    right: 5px;
+    color:red;
+    opacity:1;
+    font-size: 1.5em;
+    font-weight: bolder;
+    transition: ease-out 200ms
+}
+
+.dim {
+    background-color: rgba(125, 117, 117, 0.69);
+    transition:  background-color ease-in-out 500ms;
+}
+
+.sneak{
+    opacity:0;
 }

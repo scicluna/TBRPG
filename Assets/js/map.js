@@ -47,7 +47,14 @@ export const map = {
                 event: ()=>{
                     player.items = [...player.items, "potion"]
                 }
-            }
+            },
+            {
+                id:1,
+                txt:"here's some example text. take a bomb!",
+                event: ()=>{
+                    player.items = [...player.items, "bomb"]
+                }
+            },
         ]
     },
     5: {

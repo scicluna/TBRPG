@@ -8,10 +8,11 @@ import { map } from "./map.js"
 const playerName = document.getElementById("playername")
 const playerHP = document.getElementById("playerhp")
 const playerOptions = document.getElementById("playeroptions")
+const playerItems = document.getElementById("playeritems")
 const monsterHP = document.querySelectorAll("#monsterhp")
 const monsterName = document.querySelectorAll("#monstername")
 const monsterOptions = document.querySelectorAll("#monsteroptions")
-const playerItems = document.getElementById("playeritems")
+
 const background = document.querySelector("body")
 const battleSpace = document.querySelector(".battlespace")
 const peaceSpace = document.querySelector(".peacespace")
@@ -27,6 +28,7 @@ let mC = 0 //monster count
 
 let activeBattle = true
 let monstersAlive = true
+let currentTurn = player
 
 //running the game
 function init(){
@@ -53,7 +55,7 @@ function displayAttacks(character){
                 btn.innerText = btnContent 
                 btn.classList.add(`${char}Attack`)
                 btn.addEventListener("click", attack)
-                monsterOptions[mC].appendChild(btn) //mC is kind of like i, but i wanted to use a forEach loop instead for fun
+                monsterOptions[mC].appendChild(btn)
             }
     }
     //loop for player
@@ -87,6 +89,10 @@ function attack(e){
     attackLibrary[attackName](target)
     hpUpdate()
 
+    currentTurn = "monsters"
+
+    toggleTurn()
+
     if(monstersAlive){
     aiRetaliation()
     }
@@ -96,7 +102,7 @@ function attack(e){
             lootDrop()
             nextScene()
             clearInterval(victory)
-        },500)
+        },1000)
     }
 }
 
@@ -109,23 +115,64 @@ function aiRetaliation(){
         return
     }
 
-    monsters[cE].forEach(monster=>{
-        if (monster.hp > 0){
-        attackOptions.push(monster.attacks)
+    //apparently we can have an iterative i in forEach... wow, thats really useful to know.
+    const monsterAttack = new Promise((resolve, reject) => {
+        for (let i=0; i<monsters[cE].length; i++){
+            console.log(monsters[cE][i])
+            let aiAttackInterval = setInterval(()=>{
+                attackOptions.push(monsters[cE][i].attacks)
+                attackOptions = attackOptions.flat()
+                let randomIndex = Math.floor(Math.random()*attackOptions.length)
+                let attackName = attackOptions[randomIndex]
+                
+                attackLibrary[attackName](target)
+                hpUpdate()
+
+                attackOptions = []
+                if (i === monsters[cE].length-1){
+                    resolve("Done")
+                }
+                clearInterval(aiAttackInterval)
+            }, i*1000 + 1000)
         }
-    })
+        })
+        monsterAttack.then((resolve)=>{
+            console.log("done")
+            currentTurn = "player"
+            toggleTurn()
+        })
 
-    if(attackOptions[0] === undefined){
-        return
-    }
 
-    attackOptions.forEach(options=>{
-        let randomIndex = Math.floor(Math.random()*(options.length))
-        let attackName = options[randomIndex].toLowerCase()
-        attackLibrary[attackName](target)
-    })
-    hpUpdate()
+
+
+
+
+
+
+    // monsters[cE].forEach((monster, i)=>{
+    // if (monster.hp > 0){
+    // //somehow this setInterval is glitching with multiple enemies. Why? Its running more than once per monster somehow.
+    // const aiAttackInterval = setInterval(()=>{
+    //     attackOptions.push(monster.attacks)
+    //     console.log(attackOptions)
+    //     let randomIndex = Math.floor(Math.random()*(attackOptions[i].length))
+    //     let attackName = attackOptions[i][randomIndex]
+    //     attackOptions = []
+    //     attackLibrary[attackName](target)
+    //     hpUpdate()
+    //     clearInterval(aiAttackInterval)
+    //     if(i === monsters[cE].length-1) resolve("Done")
+    // },i * 1100 + 500)
+    //     currentTurn = "player"
+    //     }})
+    // })
+    // monsterAttack.then((resolve)=>{
+    //     toggleTurn()
+    // })
+
+
 }
+
 
 //handles life and death for each character on the screen
 //handles moving targets against the monsters in the case that the current target dies
@@ -187,7 +234,7 @@ function pickMonster(){
             monsterName[i].innerText = monsters[cE][i].name
             monsterHP[i].innerText = monsters[cE][i].hp
         }
-}
+    }
 }
 
 //initializes the targetting system
@@ -198,7 +245,6 @@ function initMonsters(){
     })
     monsterName[0].classList.add("target")
     monsterName[1].classList.remove("target")
-
 }
 
 //handles the targetting system
@@ -224,14 +270,13 @@ playerItems.innerHTML = ""
         let btnContent = item
         btn.innerText = btnContent 
         btn.classList.add(`item`)
-        btn.addEventListener("click", useitem)
+        btn.addEventListener("click", useItem)
         playerItems.appendChild(btn)
     })
 }
 
 //allows me to consume items and run a function depending on what the item was
-function useitem(e){
-    console.log(player)
+function useItem(e){
     
     let selectedItem = e.target  
     const items = document.querySelectorAll(".item")
@@ -267,6 +312,7 @@ function backgroundChange(){
 
 //initiates a battle sequence
 function battleStart(){
+    currentTurn = "player"
     battleSwitch()
     if(monsters[cE] === undefined){
         console.log("out of enemies")
@@ -349,13 +395,70 @@ function playerChoice(e){
     nextScene()
 }
 
+//Floating damage text during combat
+export function attackAnimation(target, damage){
+    console.log("animation run")
+    const floatingDamageDivs = document.querySelectorAll(".floatingdamage")
+    const possibleTargets = document.querySelectorAll(".name")
+
+    let targetElement;
+    let targetDamage;
+
+    for(let i=0; i<possibleTargets.length; i++){
+        if(possibleTargets[i].innerText == target.name && (possibleTargets[i].classList.contains("target") || possibleTargets[i].innerText === "Player")){
+            targetElement = possibleTargets[i]
+            targetDamage = floatingDamageDivs[i]
+        }
+    }
+
+    targetDamage.classList.remove("sneak")
+    targetDamage.innerText=damage
+    
+
+    const animationTiming = setInterval(()=>{
+        targetDamage.classList.add("sneak")
+        clearInterval(animationTiming)        
+    },300)
+
+    const animationTiming2 = setInterval(()=>{
+        targetDamage.innerText=""
+        clearInterval(animationTiming2)        
+    },900)
+
+
+}
+
+//disable/enable turns based on timing
+function toggleTurn(){
+    const playerAttacks = document.querySelectorAll(".playerAttack")
+    const playerItemList = document.querySelectorAll(".item")
+
+    if(currentTurn == "monsters"){
+        playerAttacks.forEach(option=>{
+            option.removeEventListener("click", attack)
+            option.classList.add("dim")
+        })
+        playerItemList.forEach(option=>{
+            option.removeEventListener("click", useItem)
+            option.classList.add("dim")
+        })
+    }
+    if(currentTurn == "player"){
+        playerAttacks.forEach(option=>{
+            option.addEventListener("click", attack)
+            option.classList.remove("dim")
+        })
+        playerItemList.forEach(option=>{
+            option.addEventListener("click", useItem)
+            option.classList.remove("dim")
+        })
+    }
+}
+
 
 //TODO
-//Random AI reactions
 //Timeouts between turns
 //Some kind of animation for attacks (like scrolling combat text, or something)
 
-//Non-combat nodes
 //More interesting items
 //Magic+Mp
-

@@ -33,14 +33,15 @@ export function hpResets(){
 //is there really no better way to do this? Every slime in my entire game needs to be cloned once for each on screen?
 const slime = new Monster("Slime", 10, ["slam"], ["potion"])
 const slime1 = new Monster("Slime", 10, ["slam"], ["potion"])
+const slime2 = new Monster("Slime", 10, ["slam"], ["potion"])
 const bear = new Monster("Bear", 15, ["bite", "claw"], ["potion", "bomb"])
 const bear1 = new Monster("Bear", 15, ["bite", "claw"], [])
 const tiger = new Monster("Tiger", 15, ["claw"], [])
 const tiger1 = new Monster("Tiger", 15, ["claw"], [])
 
 export const monsters = [
-    [slime, slime1],
-    [slime, bear], 
+    [slime, slime1, slime2],
+    [slime, slime1], 
     [slime, slime1, bear], 
     [bear, bear1, tiger, tiger1]
 ]
