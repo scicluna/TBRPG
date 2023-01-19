@@ -120,14 +120,18 @@ body{
     opacity:1;
     font-size: 1.5em;
     font-weight: bolder;
-    transition: ease-out 200ms
+    transition: opacity ease-out 200ms
 }
 
 .dim {
     background-color: rgba(125, 117, 117, 0.69);
-    transition:  background-color ease-in-out 500ms;
+    transition:  background-color ease-in-out 250ms;
 }
 
 .sneak{
     opacity:0;
+}
+
+.healing{
+    color: green !important;
 }

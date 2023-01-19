@@ -35,7 +35,7 @@ const slime = new Monster("Slime", 10, ["slam"], ["potion"])
 const slime1 = new Monster("Slime", 10, ["slam"], ["potion"])
 const slime2 = new Monster("Slime", 10, ["slam"], ["potion"])
 const bear = new Monster("Bear", 15, ["bite", "claw"], ["potion", "bomb"])
-const bear1 = new Monster("Bear", 15, ["bite", "claw"], [])
+const bear1 = new Monster("Bear", 15, ["bite", "claw"], ["potion", "bomb"])
 const tiger = new Monster("Tiger", 15, ["claw"], [])
 const tiger1 = new Monster("Tiger", 15, ["claw"], [])
 

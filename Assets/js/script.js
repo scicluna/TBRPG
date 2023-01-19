@@ -1,7 +1,7 @@
 import { Player } from "./player.js"
 import { monsters, hpResets } from "./monster.js"
-import { attackLibrary } from "./attacks.js"
-import { itemLibrary } from "./items.js"
+import { attackLibrary, aoeAttack } from "./attacks.js"
+import { itemLibrary, aoeItem } from "./items.js"
 import { map } from "./map.js"
 
 //DOMS
@@ -20,7 +20,7 @@ const peaceText = document.querySelector(".text")
 const peaceOptions = document.querySelector(".peaceoptions")
 
 //creating a new "player"
-export let player = new Player("Player", 10, ["sword", "cleave"])
+export let player = new Player("Player", 20, ["sword", "cleave"])
 
 export let nN = 0 // node number
 export let cE = 0 //creature encounter
@@ -109,68 +109,39 @@ function attack(e){
 //handles the ai turns -- make a weighted average formula to determine a weight on each attack
 function aiRetaliation(){
     let target = player
+    let deathTimer = 0
     let attackOptions = []
 
     if(monsters[cE] === undefined){
         return
     }
 
-    //apparently we can have an iterative i in forEach... wow, thats really useful to know.
     const monsterAttack = new Promise((resolve, reject) => {
         for (let i=0; i<monsters[cE].length; i++){
-            console.log(monsters[cE][i])
-            let aiAttackInterval = setInterval(()=>{
-                attackOptions.push(monsters[cE][i].attacks)
-                attackOptions = attackOptions.flat()
-                let randomIndex = Math.floor(Math.random()*attackOptions.length)
-                let attackName = attackOptions[randomIndex]
-                
-                attackLibrary[attackName](target)
-                hpUpdate()
+            if(!monsterName[i].classList.contains("dead")){
+                let aiAttackInterval = setInterval(()=>{
+                    attackOptions.push(monsters[cE][i].attacks)
+                    attackOptions = attackOptions.flat()
+                    let randomIndex = Math.floor(Math.random()*attackOptions.length)
+                    let attackName = attackOptions[randomIndex]
+                    
+                    attackLibrary[attackName](target)
+                    hpUpdate()
 
-                attackOptions = []
-                if (i === monsters[cE].length-1){
-                    resolve("Done")
-                }
-                clearInterval(aiAttackInterval)
-            }, i*1000 + 1000)
+                    attackOptions = []
+                    if (i === monsters[cE].length-1){
+                        resolve("Done")
+                    }
+                    clearInterval(aiAttackInterval)
+                }, i * 1000 + 1000 - deathTimer)
+            } else deathTimer += 1000
         }
-        })
+    })
         monsterAttack.then((resolve)=>{
             console.log("done")
             currentTurn = "player"
             toggleTurn()
         })
-
-
-
-
-
-
-
-
-    // monsters[cE].forEach((monster, i)=>{
-    // if (monster.hp > 0){
-    // //somehow this setInterval is glitching with multiple enemies. Why? Its running more than once per monster somehow.
-    // const aiAttackInterval = setInterval(()=>{
-    //     attackOptions.push(monster.attacks)
-    //     console.log(attackOptions)
-    //     let randomIndex = Math.floor(Math.random()*(attackOptions[i].length))
-    //     let attackName = attackOptions[i][randomIndex]
-    //     attackOptions = []
-    //     attackLibrary[attackName](target)
-    //     hpUpdate()
-    //     clearInterval(aiAttackInterval)
-    //     if(i === monsters[cE].length-1) resolve("Done")
-    // },i * 1100 + 500)
-    //     currentTurn = "player"
-    //     }})
-    // })
-    // monsterAttack.then((resolve)=>{
-    //     toggleTurn()
-    // })
-
-
 }
 
 
@@ -289,13 +260,22 @@ function useItem(e){
     }
 
     let item = e.target.innerText
-    itemLibrary[item]() //executes code from our itemLibrary object
+    itemLibrary[item](player) //executes code from our itemLibrary object
 
     player.items.splice(itemIndex, 1)
 
     //updates our DOMs
     hpUpdate(player)
     displayItems(player)
+    
+    currentTurn = "monsters"
+
+    toggleTurn()
+
+    if(monstersAlive){
+    aiRetaliation()
+    }
+
 }
 
 //handles looting the monsters after killing them
@@ -401,32 +381,36 @@ export function attackAnimation(target, damage){
     const floatingDamageDivs = document.querySelectorAll(".floatingdamage")
     const possibleTargets = document.querySelectorAll(".name")
 
-    let targetElement;
-    let targetDamage;
-
     for(let i=0; i<possibleTargets.length; i++){
-        if(possibleTargets[i].innerText == target.name && (possibleTargets[i].classList.contains("target") || possibleTargets[i].innerText === "Player")){
+        let targetElement;
+        let targetDamage;
+        if(possibleTargets[i].innerText == target.name && (possibleTargets[i].classList.contains("target") || aoeItem === true || aoeAttack === true || possibleTargets[i].innerText === "Player")){
             targetElement = possibleTargets[i]
             targetDamage = floatingDamageDivs[i]
+            targetDamage.classList.remove("sneak")
+
+            if(damage < 0){
+                targetDamage.classList.add("healing")
+                targetDamage.innerText = damage.toString().replace("-","")
+            } else targetDamage.innerText= damage
+
+
+
+
+            const animationTiming = setInterval(()=>{
+                targetDamage.classList.add("sneak")
+                clearInterval(animationTiming)        
+            },300)
+        
+            const animationTiming2 = setInterval(()=>{
+                targetDamage.innerText=""
+                clearInterval(animationTiming2)     
+                targetDamage.classList.remove("healing")   
+            },900)
         }
     }
-
-    targetDamage.classList.remove("sneak")
-    targetDamage.innerText=damage
-    
-
-    const animationTiming = setInterval(()=>{
-        targetDamage.classList.add("sneak")
-        clearInterval(animationTiming)        
-    },300)
-
-    const animationTiming2 = setInterval(()=>{
-        targetDamage.innerText=""
-        clearInterval(animationTiming2)        
-    },900)
-
-
 }
+
 
 //disable/enable turns based on timing
 function toggleTurn(){

@@ -1,5 +1,7 @@
 import { monsters } from "./monster.js"
-import { player, cE, attackAnimation } from "./script.js"
+import { player, cE, attackAnimation} from "./script.js"
+
+export let aoeAttack=false
 
 export const attackLibrary = 
 {
@@ -28,9 +30,11 @@ export const attackLibrary =
     },
     cleave: ()=>{
         monsters[cE].forEach(monster=>{
+            aoeAttack = true
             let damage = 2
             monster.hp -= damage
             attackAnimation(monster, damage)
+            aoeAttack = false
         })
     }
 }
