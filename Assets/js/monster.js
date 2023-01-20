@@ -25,6 +25,7 @@ class Monster {
 export function hpResets(){
     slime.reset()
     slime1.reset()
+    slime2.reset()
     bear.reset()
     bear1.reset()
     tiger1.reset()
@@ -41,7 +42,7 @@ const tiger1 = new Monster("Tiger", 15, ["claw"], [])
 
 export const monsters = [
     [slime, slime1, slime2],
-    [slime, slime1], 
+    [slime, slime1, slime2], 
     [slime, slime1, bear], 
     [bear, bear1, tiger]
 ]

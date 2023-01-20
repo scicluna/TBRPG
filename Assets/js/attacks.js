@@ -10,6 +10,11 @@ export const attackLibrary =
         target.hp -= damage
         actionAnimation(target, damage)
     },
+    testsword: (target)=>{
+        let damage = 15
+        target.hp -= damage
+        actionAnimation(target, damage)
+    },
     kick: (target)=>{
         target.hp -= 1
     },
