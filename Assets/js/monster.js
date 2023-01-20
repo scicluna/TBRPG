@@ -1,7 +1,7 @@
 class Monster {
 
     constructor(name, hp, attacks, loot){
-        this.originalhp = hp
+        this.maxhp = hp
         this.name = name
         this.hp = hp
         this.attacks = attacks
@@ -10,7 +10,7 @@ class Monster {
     }
 
     reset(){
-        this.hp = this.originalhp
+        this.hp = this.maxhp
     }
 
     attacks(){
@@ -43,5 +43,5 @@ export const monsters = [
     [slime, slime1, slime2],
     [slime, slime1], 
     [slime, slime1, bear], 
-    [bear, bear1, tiger, tiger1]
+    [bear, bear1, tiger]
 ]

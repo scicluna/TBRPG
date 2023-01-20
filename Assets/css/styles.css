@@ -1,5 +1,6 @@
 *, *::after, *::before{
     box-sizing: border-box;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 body{
@@ -31,10 +32,51 @@ body{
     margin: 1vw;
 }
 
-.playerhp {
+.monstername{
     margin: 1vw;
 }
 
+.hpcontainer {
+    display: flex;
+    width: 200px;
+    border: solid 1px rgba(255, 255, 255, 0.53);
+    height:4vh;
+}
+
+.monsterhpcontainer {
+    display: flex;
+    width: 200px;
+    border: solid 1px rgba(255, 255, 255, 0.53);
+    height:4vh;
+}
+
+.playerhp {
+    --hpfill: 100%;
+    width: var(--hpfill);
+    background-color: red;
+    transition: width ease-in-out 300ms;
+    color:rgba(255, 255, 255, 0.53);
+    font-weight: bolder;
+    font-size:.7em;
+    height:4vh;
+    display:flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.monsterhp{
+    --mhpfill: 100%;
+    width: var(--mhpfill);
+    background-color: red;
+    transition: width ease-in-out 300ms;
+    color:rgba(255, 255, 255, 0.53);
+    font-weight: bolder;
+    font-size:.7em;
+    height:4vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
 .playernamehp {
     display: flex;
     align-items: center;
@@ -80,10 +122,6 @@ body{
     margin: 1vw;
 }
 
-.monsterhp {
-    margin: 1vw;
-}
-
 .monsternamehp {
     display: flex;
     align-items: center;
@@ -114,7 +152,7 @@ body{
 
 .floatingdamage{
     position: absolute;
-    top: 30px;
+    top: 35px;
     right: 5px;
     color:red;
     opacity:1;
@@ -135,3 +173,4 @@ body{
 .healing{
     color: green !important;
 }
+
